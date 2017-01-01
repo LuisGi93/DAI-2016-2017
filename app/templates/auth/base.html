@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!-- Website template by freewebsitetemplates.com -->
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Origin Architects Website Template</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+
+</head>
+<body>
+	<div id="background-green">
+		background
+	</div>
+	<div class="page">
+    <div class='container-cabecera'>
+			<a href="http://www.ugr.es">
+			</a>
+			<img src="{{ url_for('static', filename='images/logob.png') }}" alt="departamento" style="width:53px; height:67px;" id="departamento">
+<p class="cabecera">Web de críticas</p></br>
+<p class="scabecera">por ahora</p></br>
+
+{% if not session.logged_in %}
+
+<div class="formulario_login">
+				 {% macro render_field(field, placeholder=None) %}
+				 {% if field.errors %}
+				 <div>
+				 {% elif field.flags.error %}
+				 <div>
+				 {% else %}
+				 <div>
+				 {% endif %}
+				     {% set css_class = 'form-control ' + kwargs.pop('class', '') %}
+				     {{ field(class=css_class, placeholder=placeholder, **kwargs) }}
+				 </div>
+				 {% endmacro %}
+
+				 <div>
+				   <div>
+				     {% with errors = get_flashed_messages(category_filter=["error"]) %}
+				     {% if errors %}
+				     <div>
+				     {% for error in errors %}
+				     {{ error }}<br>
+				     {% endfor %}
+				     </div>
+				     {% endif %}
+				     {% endwith %}
+
+				     {% if form.errors %}
+				     <div>
+				     {% for field, error in form.errors.items() %}
+				     {% for e in error %}
+				     {{ e }}<br>
+				     {% endfor %}
+				     {% endfor %}
+				     </div>
+				     {% endif %}
+				     <form method="POST" action="." accept-charset="UTF-8" role="form">
+				       {{ form.csrf_token }}
+				       {{ render_field(form.email, placeholder="Your Email Address",
+				                                   autofocus="") }}
+				       {{ render_field(form.password, placeholder="Password") }}
+				       <button type="submit" name="submit">Iniciar sesión</button>
+				     </form>
+				   </div>
+				 </div>
+			 </div>
+
+    </div>
+
+	{% else %}
+		<p class="formulario_login"> Bienvenido {{session.user_id}} </p>
+		<div class="logout">
+								<form align="right" name="formlogout" method="post" action="{{ url_for('auth.logout') }}">
+								<label>
+										<input name="submitlogout" type="submit" id="submit2" value="Cerrar sesión.">
+								</label>
+								</form>
+		</div>
+{{usuario}}
+{% endif%}
+
+
+		<div class="home-page">
+			<div class="sidebar">
+				<a href="index.html" id="logo"><img src="images/logo.png" alt="logo"></a>
+				<ul>
+					<li class="selected home">
+						<a href="{{ url_for('auth.signin') }}">Home</a>
+					</li>
+          <li class="about">
+						<a href="{{ url_for('auth.show') }}">Quien eres</a>
+					</li>
+					<li class="projects">
+						<a href="{{ url_for('auth.modificar') }}">Modificar datos</a>
+					</li>
+					<li class="blog">
+						<a href="{{ url_for('auth.signup') }}">Registrarse</a>
+					</li>
+					<li class="contact">
+						<a href="contact.html">Contact</a>
+					</li>
+				</ul>
+				<div class="connect">
+					<a href="http://freewebsitetemplates.com/go/facebook/" id="fb">facebook</a> <a href="http://freewebsitetemplates.com/go/twitter/" id="twitter">twitter</a> <a href="http://freewebsitetemplates.com/go/googleplus/" id="googleplus">google+</a> <a href="http://freewebsitetemplates.com/go/youtube/" id="youtube">youtube</a>
+				</div>
+			</div>
+			<div class="body">
+				<div class="content-home">
+{% block content %}
+{% endblock %}
+				<div class="footer">
+					<p>
+						&#169; 2064 Luis Gil Guijarro
+					</p></br>
+					Attribution-NonCommercial 4.0 International
+					<ul>
+						<li>
+							<a href="index.html">Home</a>
+						</li>
+						<li>
+							<a href="about.html">About</a>
+						</li>
+						<li>
+							<a href="projects.html">Projects</a>
+						</li>
+						<li>
+							<a href="blog.html">Blog</a>
+						</li>
+						<li>
+							<a href="contact.html">Contact</a>
+						</li>
+					</ul>
+				<br>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{% extends "index.html"  %}
+{% block content %}
+{% macro render_field(field, placeholder=None) %}
+{% if field.errors %}
+<div>
+{% elif field.flags.error %}
+<div>
+{% else %}
+<div>
+{% endif %}
+    {% set css_class = 'form-control ' + kwargs.pop('class', '') %}
+    {{ field(class=css_class, placeholder=placeholder, **kwargs) }}
+</div>
+{% endmacro %}
+
+<div>
+  <div>
+    {% with errors = get_flashed_messages(category_filter=["error"]) %}
+    {% if errors %}
+    <div>
+    {% for error in errors %}
+    {{ error }}<br>
+    {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% if form.errors %}
+    <div>
+    {% for field, error in form.errors.items() %}
+    {% for e in error %}
+    {{ e }}<br>
+    {% endfor %}
+    {% endfor %}
+    </div>
+    {% endif %}
+    <h1> Modificando los datos de {{session.user_id}} </h1>
+    <form method="POST" action="." accept-charset="UTF-8" role="form">
+      {{ form.csrf_token }}
+      {{ render_field(form.username, placeholder="Nuevo nombre de usuario:",
+                                  autofocus="") }}
+      {{ render_field(form.email, placeholder="Nuevo email",
+                                  autofocus="") }}
+      {{ render_field(form.password, placeholder="Nueva contraseña") }}
+      <button type="submit" name="submit">Modificar datos</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Web - Luis Gil Guijarro</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/shop-homepage.css') }}" type="text/css">
+    <script src="{{ url_for('static', filename='jquery-3.1.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+
+    <script>
+
+
+                $(document).ready(function(){
+
+                  <!-- Funcion que se encarga de cambiar el tipo de letra al pular el boton de la parte superior --!>
+                    $(".tipo-letra").click(function(){
+                      $texto=$(this).text()
+                      if($texto == "Arial sans-serif"){
+                        $(".list-group-item").css("font-family", "Verdana, Arial, Helvetica, sans-serif");
+                        $("p").css("font-family", "Verdana, Arial, Helvetica, sans-serif");
+                        $("#pletra").text("Tipo letra: Verdana arial, sans-serif");
+                      }
+                      else if($texto == "Lucida monospace"){
+                        $(".list-group-item").css("font-family", "Lucida Console, Courier, monospace");
+                        $("p").css("font-family", "Lucida Console, Courier, monospace");
+                        $("#pletra").text("Tipo letra: Lucida consoloe, monospace");
+                      }
+
+
+                    });
+                    $(".tamanio-letra").click(function(){
+                      $texto=$(this).text()
+                      if($texto == "10"){
+                        $(".list-group-item").css("font-size", "10px");
+                        $("p").css("font-size", "10px");
+                        $("#psize").text("Tamaño letra: 10px")
+                      }
+                      else if($texto == "17"){
+                        $(".list-group-item").css("font-size", "17px");
+                        $("p").css("font-size", "17px");
+                        $("#psize").text("Tamaño letra: 17px")
+                      }
+                      else if($texto == "14"){
+                        $(".list-group-item").css("font-size", "14px");
+                        $("p").css("font-size", "14px");
+                        $("#psize").text("Tamaño letra: 14px");
+                      }
+
+                    });
+                    $( "#cambia-letra" ).on( "mouseenter", function() {
+                        $(".dropdown-menu").dropdown("toggle");
+                    });
+                    $( "cambia-letra" ).on( "mouseleave", function() {
+                        setTimeout(function(){  $(".dropdown-menu").dropdown("toggle")}, "2100");
+
+
+                    });
+                    $( "#infopagina" ).on( "mouseenter", function() {
+
+
+                        $("#psize").show( "slow").delay(1500).fadeTo("slow", 0);
+                        $("#psize").hide( "slow");
+                        $("#psize").fadeTo("slow", 1);
+                        $("#pletra").show( "slow").delay(1500).fadeTo("slow", 0);
+                        $("#pletra").hide( "slow");
+                        $("#pletra").fadeTo("slow", 1);
+
+                    });
+
+
+                    $(".pagina").click(function(){
+                      $(".active").removeClass("active");
+                      $(this).addClass("active");
+                      $.get("../pagina?pagina="+ $(this).text(), function(data, status){
+                          var obj =JSON.parse(data);
+
+                          var arrayLength = obj.length;
+                          for (var i = 0; i < arrayLength; i++) {
+
+                            $("#rname.row"+i).text(obj[i].name);
+                            $("#rid.row"+i).text(obj[i].restaurant_id);
+                            $("#rcuisine.row"+i).text(obj[i].cuisine);
+                            $("#raddress.row"+i).text(obj[i].address.street);
+                            //Do something
+                          }
+
+                      });
+
+                    });
+
+
+
+
+
+
+
+
+                });
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+<style>
+.hide{
+  display:hidden;
+}
+
+/* Always set the map height explicitly to define the size of the div
+ * element that contains the map. */
+#map {
+  height: 30%;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+</style>
+
+
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          	<img class="navbar-brand" src="{{ url_for('static', filename='images/logob.png') }}" alt="departamento" style="width:53px; height:67px;" id="departamento">
+        </div>
+
+
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#"><span class="glyphicon glyphicon-log-in"></span>
+
+  {% if not session.logged_in %}
+            <div class="formulario_login">
+                     {% macro render_field(field, placeholder=None) %}
+                     {% if field.errors %}
+                     <div>
+                     {% elif field.flags.error %}
+                     <div>
+                     {% else %}
+                     <div>
+                     {% endif %}
+                         {% set css_class = 'form-control ' + kwargs.pop('class', '') %}
+                         {{ field(class=css_class, placeholder=placeholder, **kwargs) }}
+                     </div>
+                     {% endmacro %}
+
+                     <div>
+                       <div>
+                         {% with errors = get_flashed_messages(category_filter=["error"]) %}
+                         {% if errors %}
+                         <div>
+                         {% for error in errors %}
+                         {{ error }}<br>
+                         {% endfor %}
+                         </div>
+                         {% endif %}
+                         {% endwith %}
+
+                         {% if form.errors %}
+                         <div>
+                         {% for field, error in form.errors.items() %}
+                         {% for e in error %}
+                         {{ e }}<br>
+                         {% endfor %}
+                         {% endfor %}
+                         </div>
+                         {% endif %}
+                         <form method="POST" action="." accept-charset="UTF-8" role="form">
+                           {{ form.csrf_token }}
+                           {{ render_field(form.email, placeholder="Your Email Address",
+                                                       autofocus="") }}
+                           {{ render_field(form.password, placeholder="Password") }}
+                           <button type="submit" name="submit">Iniciar sesión</button>
+                         </form>
+                       </div>
+                     </div>
+                   </div>
+
+                </div>
+
+              {% else %}
+                <p class="formulario_login"> Bienvenido {{session.user_id}} </p>
+                <div class="logout">
+                            <form align="right" name="formlogout" method="post" action="{{ url_for('auth.logout') }}">
+                            <label>
+                                <input name="submitlogout" type="submit" id="submit2" value="Cerrar sesión.">
+                            </label>
+                            </form>
+                </div>
+            {{usuario}}
+            {% endif%}
+
+          </a></li>
+        </ul>
+
+
+
+
+
+
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav">
+            <div class="btn-group">
+              <button style="color:#ffffff; background-color: #777;  border-color:#555;" class="btn btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Cambiar tipo letra
+              </button>
+              <div class="dropdown-menu" id="cambiar-letra">
+                <a class="dropdown-item tamanio-letra" href="#">14</a>
+                <a class="dropdown-item tamanio-letra" href="#">10</a>
+                <a class="dropdown-item tamanio-letra" href="#">17</a>
+                <div class="dropdown-divider"></div>
+
+                <a class="dropdown-item  tipo-letra" href="#">Arial sans-serif</a>
+                <a class="dropdown-item  tipo-letra" href="#">Lucida monospace</a>
+              </div>
+            </div>
+
+              <button id="infopagina" style="color:#ffffff; background-color: #777;  border-color:#555;" class="btn btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Información página.
+              </button>
+              <a  style="display:none" id="pletra">Tipo letra: por defecto.</a>
+                  <a style="display:none" id="psize">Tamaño letra: por defecto.</a>
+
+          </div>
+
+          </ul>
+
+        </div>
+      </div>
+
+
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-md-2">
+
+                <div class="list-group">
+
+                    <a href="{{ url_for('auth.signin') }}" class="list-group-item">Home</a>
+                    <a href="{{ url_for('auth.show') }}" class="list-group-item">Quien eres</a>
+                    <a href="{{ url_for('auth.modificar') }}" class="list-group-item">Modificar datos</a>
+                    <a href="{{ url_for('auth.signup') }}" class="list-group-item">Registrarse</a>
+
+
+                </div>
+
+                <div class="list-group">
+
+                    {% if  session.logged_in %}
+                    <a href="{{ url_for('auth.mostrar_restaurantes') }}" class="list-group-item">Buscar restaurantes.</a>
+                    <a href="{{ url_for('auth.introducir_restaurantes') }}" class="list-group-item">Insertar restaurantes.</a>
+                    <a href="{{ url_for('auth.modificar_restaurantes') }}" class="list-group-item">Modificar restaurantes.</a>
+                    <a href="{{ url_for('auth.nuevapagina') }}" class="list-group-item">Ver restaurantes.</a>
+                    <a href="{{ url_for('auth.maprestaurante') }}" class="list-group-item">Geolocalizar restaurante.</a>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="col-md-3 pull-right"><span class="pull-right">
+
+
+              <a style="display:none" id="ciudad" href="{{ url_for('auth.signin') }}" ></a>
+
+              <div id="container" style="height: 400px; min-width: 310px"></div>
+
+            </span>
+            </div>
+
+            <div class="col-md-6">
+
+              {% block content %}
+              {% endblock %}
+
+            </div>
+
+
+        </div>
+
+    </div>
+    <!-- /.container -->
+
+    <div class="container">
+
+        <hr>
+
+        <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; 2064 Luis Gil Guijarro</p>
+                    <p>Attribution-NonCommercial 4.0 International</p>
+                </div>
+            </div>
+
+
+        </footer>
+
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
